@@ -1,0 +1,35 @@
+name: Deploy to VPS via SSH
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no deploy@217.114.43.168 << 'EOF'
+            set -e
+            if [ ! -d ~/my-bitrix-frontend ]; then
+              git clone https://github.com/SeoLazy/my-bitrix-frontend.git ~/my-bitrix-frontend
+            fi
+
+            cd ~/my-bitrix-frontend
+            git pull origin main
+
+            cd frontend
+            npm install
+            npm run build
+            sudo cp -r dist/* /var/www/frontend/
+          EOF
