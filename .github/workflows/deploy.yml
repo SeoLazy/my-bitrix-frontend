@@ -28,7 +28,6 @@ jobs:
             cd ~/my-bitrix-frontend
             git pull origin main
 
-            cd frontend
             npm install
             npm run build
             sudo cp -r dist/* /var/www/frontend/
